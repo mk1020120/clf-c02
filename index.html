@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
 <title>CLF-C02 マークシート演習</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1821,7 +1822,10 @@ function renderHome(keep){
     <h2>学習履歴</h2>
     ${historyHTML()}
     <p class="sync" id="sync"></p>
-  </section>`;
+  </section>
+  <footer style="margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;line-height:1.7;color:var(--sub)">
+    <p style="margin:0">この問題集はAWS(Amazon Web Services)の公式教材ではなく、AWSとは関係のない非公式の学習用教材です。問題と解説はAIを使って作成しており、誤りを含む可能性があります。最新の正確な情報はAWSの公式ドキュメントで確認してください。実際の認定試験の問題は含まれていません。AWSおよび各サービス名は、Amazon.com, Inc.またはその関連会社の商標です。</p>
+  </footer>`;
   updateSyncNote();
 
   app.querySelectorAll("[data-count]").forEach(b=>b.onclick=()=>{cfg.count=+b.dataset.count;renderHome(true);focusSel('[data-count="'+cfg.count+'"]');});
