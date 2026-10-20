@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CLF-C02 マークシート演習</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3F5F8; --sheet:#FFFFFF; --ink:#1C2740; --sub:#5A6375; --line:#D3D9E3;
+  --guide:#2F64B0; --guide-soft:#E6EEF9; --mark:#262B35;
+  --ok:#1C7A50; --ok-soft:#E3F3EA; --ng:#BF3A2B; --ng-soft:#FBE8E5;
+  --flag:#C98A0B; --flag-soft:#FBF1DA;
+  --c:#2F64B0; --s:#8A3FA8; --t:#127B7E; --b:#B4651A;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141922; --sheet:#1C2330; --ink:#E7ECF4; --sub:#9AA4B6; --line:#323C4D;
+    --guide:#7FA7E6; --guide-soft:#22314A; --mark:#E7ECF4;
+    --ok:#5CC994; --ok-soft:#1A3328; --ng:#F08572; --ng-soft:#3A221F;
+    --flag:#E9B44C; --flag-soft:#3A3020;
+    --c:#7FA7E6; --s:#C795DE; --t:#5CC4C6; --b:#E3A15F; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141922; --sheet:#1C2330; --ink:#E7ECF4; --sub:#9AA4B6; --line:#323C4D;
+  --guide:#7FA7E6; --guide-soft:#22314A; --mark:#E7ECF4;
+  --ok:#5CC994; --ok-soft:#1A3328; --ng:#F08572; --ng-soft:#3A221F;
+  --flag:#E9B44C; --flag-soft:#3A3020;
+  --c:#7FA7E6; --s:#C795DE; --t:#5CC4C6; --b:#E3A15F; color-scheme: dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+  font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.wrap{max-width:720px;margin:0 auto;padding:20px 18px 64px}
+h1,h2,h3{margin:0;line-height:1.35}
+.muted{color:var(--sub)}
+.small{font-size:13px}
+
+/* buttons */
+.btn{appearance:none;border:1.5px solid var(--ink);background:transparent;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--ink);color:var(--sheet)}
+.btn.ghost{border-color:var(--line);font-weight:500}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:focus-visible,.seg button:focus-visible,.opt:focus-visible,.chip:focus-visible,.cell:focus-visible,.iconbtn:focus-visible{outline:3px solid var(--guide);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* header (home) */
+.mast{padding:28px 0 22px;border-bottom:2px solid var(--guide);margin-bottom:28px;position:relative}
+.mast .code{font-weight:900;font-size:clamp(44px,12vw,76px);letter-spacing:-.02em;line-height:1;color:var(--guide)}
+.mast h1{font-size:20px;font-weight:700;margin-top:10px}
+.mast p{margin:6px 0 0;color:var(--sub);font-size:14px}
+.marks{position:absolute;right:0;top:30px;display:grid;grid-template-columns:repeat(4,16px);gap:7px 8px}
+.marks i{width:16px;height:24px;border:1.5px solid var(--guide);border-radius:50%;display:block;opacity:.75}
+.marks i.f{background:var(--mark);border-color:var(--mark);opacity:1}
+@media (max-width:480px){.marks{display:none}}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1.5px solid var(--line);border-radius:10px;background:var(--sheet);margin-bottom:32px}
+.stats div{padding:14px 16px;border-left:1.5px solid var(--line)}
+.stats div:first-child{border-left:0}
+.stats b{display:block;font-size:26px;font-weight:900;line-height:1.2}
+.stats span{font-size:12px;color:var(--sub)}
+
+section.block{margin-bottom:34px}
+section.block>h2{font-size:18px;font-weight:900;margin-bottom:4px}
+section.block>p.lead{margin:0 0 14px;color:var(--sub);font-size:14px}
+.panel{background:var(--sheet);border:1.5px solid var(--line);border-radius:12px;padding:18px}
+.field{margin-bottom:16px}
+.field>label,.field>.lbl{display:block;font-size:13px;font-weight:700;color:var(--sub);margin-bottom:6px}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:8px;overflow:hidden;max-width:100%}
+.seg button{border:0;background:transparent;padding:8px 14px;white-space:nowrap;flex:1 1 auto;cursor:pointer;min-height:40px;font-weight:500;border-left:1.5px solid var(--ink)}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--sheet);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:999px;padding:6px 14px 6px 8px;cursor:pointer;background:transparent;min-height:40px}
+.chip .dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--dc);display:inline-block}
+.chip[aria-pressed="true"]{border-color:var(--dc)}
+.chip[aria-pressed="true"] .dot{background:var(--dc)}
+.note{font-size:13px;color:var(--sub);margin-top:8px}
+.warn{color:var(--ng)}
+
+.exam-card{display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.exam-card .big{font-weight:900;font-size:30px;line-height:1.1}
+.exam-card .big small{font-size:14px;font-weight:500;color:var(--sub);margin-left:4px}
+
+/* history */
+.spark{width:100%;height:110px;display:block}
+.hist-list{list-style:none;margin:12px 0 0;padding:0}
+.hist-list li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.weak{list-style:none;padding:0;margin:8px 0 0}
+.weak li{padding:8px 0;border-top:1px solid var(--line);font-size:14px;display:flex;gap:10px}
+.weak li .rate{font-weight:700;color:var(--ng);white-space:nowrap}
+.sync{font-size:12px;color:var(--sub);margin-top:10px}
+
+/* question screen */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);background:var(--paper);z-index:5;padding:10px 0 10px;border-bottom:1.5px solid var(--line);margin-bottom:20px}
+.bar .row{justify-content:space-between}
+.prog{height:4px;background:var(--line);border-radius:2px;margin-top:10px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--guide);transition:width .25s}
+.qno{font-weight:900;font-size:15px}
+.timer{font-weight:900;font-variant-numeric:tabular-nums;font-size:18px}
+.timer.low{color:var(--ng)}
+.iconbtn{border:1.5px solid var(--line);background:transparent;border-radius:8px;min-height:40px;padding:6px 12px;cursor:pointer;display:inline-flex;gap:6px;align-items:center;font-size:14px}
+.iconbtn[aria-pressed="true"]{border-color:var(--flag);background:var(--flag-soft);color:var(--ink)}
+.iconbtn svg{width:16px;height:16px}
+.dtag{display:inline-block;font-size:12px;font-weight:700;color:var(--dc);border:1.5px solid var(--dc);border-radius:4px;padding:0 8px;margin-bottom:10px}
+.qtext{font-size:18px;font-weight:700;line-height:1.7;margin:0 0 20px}
+.opts{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.opt{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:var(--sheet);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;min-height:56px;line-height:1.55}
+.opt:hover:not(:disabled){border-color:var(--guide)}
+.opt:disabled{cursor:default}
+.oval{flex:none;width:26px;height:38px;border-radius:50%;border:1.8px solid var(--guide);display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--guide);transition:background .15s,border-color .15s,color .15s}
+.opt.sel .oval{background:var(--mark);border-color:var(--mark);color:transparent}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ok .oval{border-color:var(--ok);color:var(--ok)}
+.opt.ok.sel .oval{background:var(--ok);border-color:var(--ok);color:transparent}
+.opt.ng{border-color:var(--ng);background:var(--ng-soft)}
+.opt.ng.sel .oval{background:var(--ng);border-color:var(--ng)}
+.opt .verdict{margin-left:auto;font-size:13px;font-weight:700;white-space:nowrap}
+.opt.ok .verdict{color:var(--ok)} .opt.ng .verdict{color:var(--ng)}
+.explain{margin-top:18px;border-left:4px solid var(--ok);background:var(--sheet);padding:14px 16px;border-radius:0 10px 10px 0}
+.explain.ng{border-left-color:var(--ng)}
+.explain h3{font-size:16px;margin-bottom:4px}
+.explain.ok h3{color:var(--ok)} .explain.ng h3{color:var(--ng)}
+.explain p{margin:0}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:24px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){.prog i,.oval{transition:none}}
+
+/* exam grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px;margin-top:14px}
+.cell{border:1.5px solid var(--line);background:var(--sheet);border-radius:6px;height:38px;cursor:pointer;font-size:13px;font-weight:700;position:relative;color:var(--sub)}
+.cell.ans{background:var(--guide-soft);border-color:var(--guide);color:var(--ink)}
+.cell.cur{outline:2px solid var(--ink);outline-offset:1px}
+.cell.fl::after{content:"";position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--flag)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px;border:1.5px solid var(--line)}
+
+/* results */
+.score{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;padding:12px 0 22px;border-bottom:2px solid var(--guide);margin-bottom:24px}
+.score .pct{font-size:clamp(64px,18vw,104px);font-weight:900;line-height:.9;letter-spacing:-.03em}
+.score .pct small{font-size:.38em;font-weight:700;margin-left:2px}
+.score .meta{padding-bottom:8px}
+.score .meta b{font-size:18px}
+.pass{display:inline-block;font-size:13px;font-weight:700;border-radius:4px;padding:2px 10px;margin-top:6px}
+.pass.y{background:var(--ok-soft);color:var(--ok)} .pass.n{background:var(--ng-soft);color:var(--ng)}
+.dom{display:grid;grid-template-columns:minmax(110px,auto) 1fr auto;gap:8px 12px;align-items:center;font-size:14px}
+.dom .track{height:10px;background:var(--line);border-radius:5px;overflow:hidden;position:relative}
+.dom .track i{display:block;height:100%;background:var(--dc)}
+.dom .track::after{content:"";position:absolute;left:70%;top:-2px;bottom:-2px;width:2px;background:var(--ink);opacity:.5}
+.dom .n{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.review{list-style:none;padding:0;margin:0}
+.review li{background:var(--sheet);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.review .q{font-weight:700;margin:4px 0 8px}
+.review .a{font-size:14px;margin:2px 0}
+.review .a.ngt{color:var(--ng)} .review .a.okt{color:var(--ok)}
+.review .e{font-size:14px;color:var(--sub);margin:8px 0 0}
+.review .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dlg-back{position:fixed;inset:0;background:rgba(10,15,25,.5);display:grid;place-items:center;padding:20px;z-index:20}
+.dlg{background:var(--sheet);border-radius:12px;padding:22px;max-width:420px;width:100%;border:1.5px solid var(--line)}
+.dlg p{margin:0 0 18px}
+.more{appearance:none;border:0;background:transparent;color:var(--guide);font-weight:700;cursor:pointer;padding:10px 0;min-height:44px;display:inline-flex;align-items:center;gap:6px;font-size:14px}
+.more .chev{display:inline-block;transition:transform .15s}
+.more[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.more:focus-visible,.exam-row:focus-visible{outline:3px solid var(--guide);outline-offset:2px}
+.exam-list{list-style:none;margin:8px 0 0;padding:0}
+.exam-list li{border-top:1px solid var(--line)}
+.exam-row{appearance:none;width:100%;border:0;background:transparent;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;cursor:pointer;text-align:left;font-size:14px;min-height:44px}
+.exam-row:disabled{cursor:default}
+.exam-row .sc{font-weight:700;white-space:nowrap}
+.exam-row .sc .p{display:inline-block;min-width:3.2em;text-align:right}
+.exam-row .go{color:var(--guide);font-weight:700;margin-left:6px}
+.exam-row .nod{color:var(--sub);font-size:12px;font-weight:500;margin-left:6px}
+@media (prefers-reduced-motion:reduce){.more .chev{transition:none}}
+.empty{padding:18px;border:1.5px dashed var(--line);border-radius:10px;color:var(--sub);font-size:14px}
+</style>
+</head>
+<body>
+<main class="wrap" id="app" aria-live="polite"></main>
+<script>
+const Q = [
+// ===== 分野1: クラウドの概念 (c) 24問 =====
+["c01","c","AWSクラウドの6つの利点の1つとして正しいものはどれですか?",["固定費(資本的支出)を変動費に置き換える","変動費を固定費に置き換える","データセンターの運用・保守に投資を増やす","キャパシティを事前に予測して確保する必要がある"],0,"クラウドでは先行投資(CapEx)の代わりに、使った分だけ支払う変動費(OpEx)にできます。ほかにも「キャパシティ予測が不要」「数分で世界展開」などの利点があります。"],
+["c02","c","AWS Well-Architected フレームワークの6つの柱に「含まれない」ものはどれですか?",["スケーラビリティ","信頼性","持続可能性","コスト最適化"],0,"6つの柱は、運用上の優秀性・セキュリティ・信頼性・パフォーマンス効率・コスト最適化・持続可能性です。スケーラビリティは重要な概念ですが、柱の名前ではありません。"],
+["c03","c","オンプレミスのアプリケーションを、変更を加えずにそのままAWSへ移行する移行戦略はどれですか?",["リホスト(Rehost)","リファクタリング(Refactor)","リプラットフォーム(Replatform)","リパーチェス(Repurchase)"],0,"リホストは「リフト&シフト」とも呼ばれ、アプリをそのまま移行します。リプラットフォームは一部最適化、リファクタリングはクラウドネイティブに再設計、リパーチェスはSaaSなどへの乗り換えです。"],
+["c04","c","需要の増減に合わせて、リソースを自動的に拡張・縮小できるクラウドの特性はどれですか?",["伸縮性(Elasticity)","耐久性(Durability)","可用性(Availability)","機密性(Confidentiality)"],0,"伸縮性は需要に応じてリソースを自動で増減できる特性で、Auto Scalingなどで実現します。耐久性はデータが失われにくいこと、可用性はシステムが利用可能な状態を保つことです。"],
+["c05","c","オンプレミスのデータセンターとAWSクラウドを接続して併用するデプロイモデルはどれですか?",["ハイブリッド","クラウドネイティブ(オールイン)","オンプレミス(プライベートクラウド)","マルチテナント"],0,"ハイブリッドデプロイは、既存のオンプレミス環境とクラウドを接続して使うモデルです。すべてをクラウドで動かすのがクラウドデプロイ、仮想化技術で社内に構築するのがオンプレミスデプロイです。"],
+["c06","c","「規模の経済の恩恵を受ける」というクラウドの利点の説明として正しいものはどれですか?",["多数の顧客の利用が集約されるため、従量課金の料金が低くなる","自社でサーバーを大量購入すると割引が受けられる","利用量が多いほど料金が高くなる","データセンターを自社で建設する費用が安くなる"],0,"AWSは膨大な数の顧客の利用を集約することで規模の経済を実現し、その分を低い従量料金として顧客に還元しています。"],
+["c07","c","Well-Architected フレームワークの「信頼性」の柱における設計原則はどれですか?",["障害から自動的に復旧する","すべての操作を手動で実行する","単一の大きなサーバーに集約する","キャパシティを推測で決める"],0,"信頼性の柱の設計原則には「障害から自動的に復旧する」「水平方向にスケールする」「キャパシティを推測しない」などがあります。"],
+["c08","c","「運用をコードとして実行する」「小規模で可逆的な変更を頻繁に行う」を設計原則とするWell-Architectedの柱はどれですか?",["運用上の優秀性","パフォーマンス効率","セキュリティ","持続可能性"],0,"運用上の優秀性の柱は、システムの運用・監視と継続的な改善に焦点を当てています。運用手順をコード化し、小さな変更を頻繁に行うことが推奨されます。"],
+["c09","c","「サーバーレスアーキテクチャを使用する」「数分でグローバル展開する」を設計原則とするWell-Architectedの柱はどれですか?",["パフォーマンス効率","信頼性","コスト最適化","運用上の優秀性"],0,"パフォーマンス効率の柱は、コンピューティングリソースを効率的に使うことに焦点を当て、最新技術の活用やサーバーレスの採用などを推奨しています。"],
+["c10","c","ワークロードによる環境への影響(エネルギー消費など)を最小限に抑えることに焦点を当てたWell-Architectedの柱はどれですか?",["持続可能性","コスト最適化","運用上の優秀性","信頼性"],0,"持続可能性の柱は2021年に追加され、使用率の最大化やマネージドサービスの活用などで環境への影響を減らすことを目指します。"],
+["c11","c","AWSクラウド導入フレームワーク(AWS CAF)のパースペクティブに「含まれない」ものはどれですか?",["マーケティング","ガバナンス","人材(People)","プラットフォーム"],0,"AWS CAFの6つのパースペクティブは、ビジネス・人材・ガバナンス・プラットフォーム・セキュリティ・オペレーションです。"],
+["c12","c","AWS CAFにおいて、組織構造の変更やスタッフのトレーニング、スキル習得に焦点を当てたパースペクティブはどれですか?",["人材(People)","ビジネス","プラットフォーム","オペレーション"],0,"人材パースペクティブは、文化の変革、組織設計、トレーニングなど「人」の側面からクラウド導入を支援します。"],
+["c13","c","移行の検討中に、不要になったアプリケーションを停止して廃止する移行戦略はどれですか?",["リタイア(Retire)","リテイン(Retain)","リロケート(Relocate)","リホスト(Rehost)"],0,"リタイアは不要なアプリを廃止する戦略です。リテインは当面オンプレミスに残す戦略、リロケートはVMware環境などをそのままクラウドへ移す戦略です。"],
+["c14","c","アプリのコアアーキテクチャは変えずに、自前のデータベースをAmazon RDSに移すなど一部を最適化して移行する戦略はどれですか?",["リプラットフォーム(Replatform)","リホスト(Rehost)","リファクタリング(Refactor)","リタイア(Retire)"],0,"リプラットフォームは「リフト・ティンカー&シフト」とも呼ばれ、大きなコード変更なしにマネージドサービスなどを活用して一部最適化します。"],
+["c15","c","ネットワーク帯域が限られている環境で、数十TB〜PB規模のデータを物理デバイスでAWSへ移行したい場合に適したサービスはどれですか?",["AWS Snowball Edge","AWS Direct Connect","Amazon S3 Transfer Acceleration","AWS Site-to-Site VPN"],0,"AWS Snow Familyの物理デバイスにデータをコピーしてAWSへ配送することで、ネットワークを使わずに大容量データを移行できます。"],
+["c16","c","移行中もソースデータベースを稼働させたまま、データベースをAWSへ移行できるサービスはどれですか?",["AWS Database Migration Service(DMS)","AWS Backup","AWS DataSync","Amazon Athena"],0,"AWS DMSを使うと、移行中もソースDBを使い続けられるためダウンタイムを最小限にできます。異なるDBエンジン間の移行にも対応しています。"],
+["c17","c","新しいITリソースを数分で調達でき、低コストで試行錯誤しやすくなるクラウドの利点はどれですか?",["速度と俊敏性の向上","規模の経済","キャパシティの予測が不要","データセンターの運用が不要"],0,"クラウドではリソースをすぐに用意・破棄できるため、実験や開発のスピードが上がります。これが「速度と俊敏性の向上」です。"],
+["c18","c","「数分でグローバルに展開」という利点を実現しているAWSの特徴はどれですか?",["世界中に分散したリージョンとアベイラビリティーゾーン","AWS Marketplace","オンデマンド料金","AWS Organizations"],0,"AWSは世界各地にリージョンを持っているため、少ない操作で世界中のユーザーの近くにアプリをデプロイできます。"],
+["c19","c","AWSに移行することで、顧客が行う必要がなくなる「差別化につながらない重労働」の例はどれですか?",["データセンターのラッキング、電源・空調の管理","アプリケーションの機能開発","顧客データの分類とアクセス権の管理","ビジネス要件の定義"],0,"物理インフラの管理はAWSが担うため、顧客は自社のビジネスやアプリ開発に集中できます。データやアクセス管理は引き続き顧客の責任です。"],
+["c20","c","自社のワークロードをWell-Architectedのベストプラクティスに照らしてレビューできる無料ツールはどれですか?",["AWS Well-Architected Tool","AWS Trusted Advisor","AWS Config","AWS Health Dashboard"],0,"AWS Well-Architected Toolは、質問に答えることでワークロードを6つの柱に沿って評価し、改善計画を立てられるツールです。"],
+["c21","c","Well-Architectedの「コスト最適化」の柱における設計原則はどれですか?",["消費モデルを導入する(使った分だけ支払う)","すべてのリソースを常時最大構成で稼働させる","長期のハードウェア購入契約を結ぶ","コストの可視化は年1回で十分"],0,"コスト最適化の柱では、消費モデルの導入、全体的な効率の測定、差別化につながらない作業への支出削減、支出の分析と帰属などが推奨されます。"],
+["c22","c","Well-Architectedの「セキュリティ」の柱における設計原則はどれですか?",["すべてのレイヤーでセキュリティを適用する","境界ネットワークだけを防御する","長期の認証情報を共有して使う","ログは障害時のみ取得する"],0,"セキュリティの柱では、多層防御(すべてのレイヤーへの適用)、強力なアイデンティティ基盤、トレーサビリティの実現などが設計原則です。"],
+["c23","c","アプリケーションのコンポーネント間をメッセージキューで疎結合にし、一方の障害が他方に波及しにくくするためのサービスはどれですか?",["Amazon SQS","Amazon EBS","Amazon Route 53","AWS Direct Connect"],0,"Amazon SQSはフルマネージドのメッセージキューサービスです。送信側と受信側を疎結合にすることで、システム全体の耐障害性が高まります。"],
+["c24","c","複数の移行ツールの進捗を一元的に追跡・管理できるサービスはどれですか?",["AWS Migration Hub","AWS Snowcone","Amazon CloudFront","AWS Artifact"],0,"AWS Migration Hubは、移行プロジェクト全体の状況を1か所で把握できるサービスです。"],
+
+// ===== 分野2: セキュリティとコンプライアンス (s) 30問 =====
+["s01","s","AWSの責任共有モデルにおいて、Amazon EC2を利用する場合に「顧客」の責任となるものはどれですか?",["ゲストOSのパッチ適用と更新","データセンターの物理的なセキュリティ","ハイパーバイザーの保守","ネットワークインフラのハードウェア管理"],0,"EC2はIaaSなので、ゲストOS以上のレイヤー(OSパッチ、アプリ、セキュリティグループ設定など)は顧客の責任です。物理施設・ハードウェア・ハイパーバイザーはAWSの責任です。"],
+["s02","s","監査対応のため、AWSのSOCレポートやISO認証などのコンプライアンスレポートをダウンロードしたい場合、どのサービスを使いますか?",["AWS Artifact","AWS Trusted Advisor","Amazon Inspector","AWS Config"],0,"AWS Artifactは、AWSのコンプライアンスレポートや契約(BAAなど)にオンデマンドでアクセスできるポータルです。"],
+["s03","s","AWSアカウントのルートユーザーに関するベストプラクティスとして正しいものはどれですか?",["MFAを有効化し、日常業務には使用しない","日常的な管理作業はルートユーザーで行う","ルートユーザーのアクセスキーを作成して共有する","ルートユーザーのパスワードは変更しない"],0,"ルートユーザーには強力なパスワードとMFAを設定し、日常業務にはIAMユーザーやIAM Identity Centerを使います。ルートのアクセスキーは作成しないのが推奨です。"],
+["s04","s","DDoS攻撃からアプリケーションを保護するためのAWSサービスはどれですか?",["AWS Shield","Amazon Macie","AWS KMS","Amazon Cognito"],0,"AWS ShieldはDDoS保護サービスで、Standardは追加料金なしで自動適用、Advancedはより高度な保護を提供します。"],
+["s05","s","「誰が・いつ・どのAPIを呼び出したか」を記録し、監査に利用できるサービスはどれですか?",["AWS CloudTrail","Amazon CloudWatch","AWS X-Ray","AWS Trusted Advisor"],0,"CloudTrailはAWSアカウント内のAPI呼び出し履歴を記録します。CloudWatchはメトリクスとログの監視、X-Rayはアプリのトレースです。"],
+["s06","s","機械学習を使ってCloudTrailやVPCフローログなどを分析し、悪意のある活動や脅威を検出するサービスはどれですか?",["Amazon GuardDuty","Amazon Inspector","AWS WAF","AWS Secrets Manager"],0,"GuardDutyはログを継続的に分析する脅威検出サービスです。Inspectorは脆弱性スキャン、WAFはWeb攻撃のフィルタリング、Secrets Managerは認証情報の管理です。"],
+["s07","s","Amazon RDSを利用する場合、責任共有モデルで「AWS」の責任となるものはどれですか?",["データベースエンジンのパッチ適用","データベースに保存するデータの管理","データベースユーザーのアクセス権設定","セキュリティグループのルール設定"],0,"RDSはマネージドサービスなので、OSやDBエンジンのパッチ適用はAWSが行います。データの内容やアクセス制御、ネットワーク設定は顧客の責任です。"],
+["s08","s","IAMでユーザーに権限を付与する際に推奨される原則はどれですか?",["最小権限の原則","全権限付与の原則","共有アカウントの原則","権限の無期限付与"],0,"最小権限の原則では、タスクの実行に必要な最小限の権限だけを付与します。"],
+["s09","s","EC2上のアプリがS3にアクセスする際、アクセスキーをコードに埋め込まずに安全に権限を与える方法はどれですか?",["IAMロールをEC2インスタンスにアタッチする","ルートユーザーのアクセスキーを使う","アクセスキーを設定ファイルに平文で保存する","S3バケットを公開設定にする"],0,"IAMロールを使うと一時的な認証情報が自動で提供・更新されるため、長期の認証情報をコードに埋め込む必要がなくなります。"],
+["s10","s","同じ職務を持つ複数のIAMユーザーに、まとめて同じ権限を付与したい場合に使うものはどれですか?",["IAMグループ","IAMロール","アクセスキー","MFAデバイス"],0,"IAMグループにポリシーをアタッチすると、所属する全ユーザーに同じ権限が適用されるため管理が簡単になります。"],
+["s11","s","データ暗号化に使う暗号鍵を作成・管理し、その使用を制御できるサービスはどれですか?",["AWS KMS","AWS Certificate Manager","Amazon Macie","AWS Shield"],0,"AWS Key Management Service(KMS)は暗号鍵の作成・管理を行うサービスで、多くのAWSサービスと統合されています。"],
+["s12","s","SQLインジェクションやクロスサイトスクリプティング(XSS)などのWebアプリへの攻撃をブロックできるサービスはどれですか?",["AWS WAF","AWS Shield Standard","Amazon GuardDuty","AWS Config"],0,"AWS WAFはWebアプリケーションファイアウォールで、リクエストの内容に基づくルールで悪意のあるトラフィックをブロックできます。"],
+["s13","s","EC2インスタンス単位で動作し、ステートフルにトラフィックを制御する仮想ファイアウォールはどれですか?",["セキュリティグループ","ネットワークACL","AWS WAF","ルートテーブル"],0,"セキュリティグループはインスタンスレベルで動作するステートフルなファイアウォールで、許可ルールのみ設定できます。"],
+["s14","s","サブネット単位で動作し、ステートレスに許可・拒否ルールを設定できる仕組みはどれですか?",["ネットワークACL","セキュリティグループ","IAMポリシー","インターネットゲートウェイ"],0,"ネットワークACLはサブネットレベルのステートレスなファイアウォールで、許可と拒否の両方のルールを設定できます。戻りのトラフィックも明示的に許可が必要です。"],
+["s15","s","機械学習を使ってS3に保存された個人情報(PII)などの機密データを自動検出するサービスはどれですか?",["Amazon Macie","Amazon Inspector","Amazon Detective","AWS Audit Manager"],0,"Amazon MacieはS3内のデータを分析し、個人情報などの機密データを検出・分類します。"],
+["s16","s","EC2インスタンスやコンテナイメージのソフトウェア脆弱性を自動でスキャンするサービスはどれですか?",["Amazon Inspector","Amazon GuardDuty","Amazon Macie","AWS Shield"],0,"Amazon InspectorはEC2、ECRのコンテナイメージ、Lambda関数などの脆弱性を継続的にスキャンします。"],
+["s17","s","データベースのパスワードなどの認証情報を安全に保存し、自動ローテーションできるサービスはどれですか?",["AWS Secrets Manager","AWS KMS","Amazon Cognito","AWS Artifact"],0,"Secrets Managerは認証情報を暗号化して保存し、スケジュールに従って自動ローテーションできます。"],
+["s18","s","GuardDutyやInspectorなど複数のセキュリティサービスの検出結果を集約し、セキュリティ状況を一元的に確認できるサービスはどれですか?",["AWS Security Hub","AWS CloudTrail","AWS Organizations","Amazon CloudWatch"],0,"AWS Security Hubは複数のセキュリティサービスの検出結果を集約し、ベストプラクティスへの準拠状況もチェックできます。"],
+["s19","s","AWSリソースの設定変更の履歴を記録し、社内ルールに準拠しているかを継続的に評価できるサービスはどれですか?",["AWS Config","AWS CloudTrail","Amazon Inspector","AWS Trusted Advisor"],0,"AWS Configはリソースの設定状態と変更履歴を記録し、Configルールで準拠状況を評価します。「誰が操作したか」はCloudTrail、「設定がどう変わったか」はConfigと覚えましょう。"],
+["s20","s","複数のAWSアカウントやビジネスアプリケーションへのシングルサインオン(SSO)を一元管理できるサービスはどれですか?",["AWS IAM Identity Center","Amazon Cognito","AWS Directory Service","AWS Secrets Manager"],0,"IAM Identity Center(旧AWS SSO)は、従業員が複数のAWSアカウントやアプリに1つの認証情報でアクセスできるようにします。"],
+["s21","s","自社のモバイルアプリやWebアプリに、エンドユーザーのサインアップ・サインイン機能を追加したい場合に使うサービスはどれですか?",["Amazon Cognito","AWS IAM Identity Center","AWS IAM","AWS Directory Service"],0,"Amazon Cognitoはアプリのエンドユーザー向けの認証・認可を提供します。SNSアカウントでのログインにも対応しています。"],
+["s22","s","Webサイト用のSSL/TLS証明書を無料でプロビジョニング・管理・自動更新できるサービスはどれですか?",["AWS Certificate Manager(ACM)","AWS KMS","AWS Secrets Manager","Amazon Route 53"],0,"ACMで発行するパブリック証明書は、ELBやCloudFrontなどの統合サービスで無料で利用でき、自動更新されます。"],
+["s23","s","DDoS攻撃発生時に、AWS Shield Response Team(SRT)へのサポートやコスト保護が受けられるのはどれですか?",["AWS Shield Advanced","AWS Shield Standard","AWS WAF","Amazon GuardDuty"],0,"Shield Advancedは有料のオプションで、高度な検出、SRTへの24時間アクセス、DDoSによるスケーリング料金の保護などが含まれます。"],
+["s24","s","セキュリティ上の問題について、ログデータを分析・可視化して根本原因の調査を支援するサービスはどれですか?",["Amazon Detective","Amazon Macie","AWS Config","AWS Artifact"],0,"Amazon Detectiveはログを自動で集めてグラフ化し、GuardDutyの検出結果などの根本原因の調査を効率化します。"],
+["s25","s","AWS Organizations内の各アカウントで使用できるサービスや操作を一元的に制限する仕組みはどれですか?",["サービスコントロールポリシー(SCP)","IAMユーザー","セキュリティグループ","ネットワークACL"],0,"SCPはOrganizationsの機能で、アカウントやOU単位で利用可能な権限の上限を設定できます。"],
+["s26","s","パスワードに加えて、デバイスで生成されたコードなど追加の認証要素を要求してセキュリティを高める仕組みはどれですか?",["多要素認証(MFA)","IAMポリシー","アクセスキー","セキュリティグループ"],0,"MFAを有効にすると、パスワードが漏えいしても追加の認証要素がなければサインインできないため、不正アクセスのリスクを大きく下げられます。"],
+["s27","s","S3バケットやIAMロールなどのうち、外部のアカウントと共有されているリソースを特定できる機能はどれですか?",["IAM Access Analyzer","AWS Artifact","Amazon Inspector","AWS Budgets"],0,"IAM Access Analyzerはリソースポリシーを分析し、組織外からアクセス可能になっているリソースを検出します。"],
+["s28","s","TLS(HTTPS)を使った通信で主に保護されるのはどれですか?",["転送中のデータ","保管中のデータ","削除済みのデータ","バックアップデータのみ"],0,"TLSは通信経路を暗号化し、転送中のデータを保護します。保管中のデータはKMSなどを使った暗号化で保護します。"],
+["s29","s","ルートユーザーのMFA未設定や、0.0.0.0/0に開放されたポートなどのセキュリティ上の問題をチェックして推奨事項を提示するサービスはどれですか?",["AWS Trusted Advisor","AWS Artifact","AWS Cost Explorer","Amazon Route 53"],0,"Trusted Advisorはコスト最適化・パフォーマンス・セキュリティ・耐障害性・サービスクォータ・運用上の優秀性の観点でアカウントをチェックし、推奨事項を提示します。"],
+["s30","s","責任共有モデルにおいて、どのAWSサービスを使う場合でも常に「顧客」の責任となるものはどれですか?",["顧客データの管理とIAMによるアクセス管理","ハードウェアの保守","リージョンとAZの物理的な運用","ハイパーバイザーのパッチ適用"],0,"サービスの種類にかかわらず、データそのものと「誰にアクセスさせるか」の管理は常に顧客の責任です。"],
+
+// ===== 分野3: クラウドテクノロジーとサービス (t) 34問 =====
+["t01","t","世界中のユーザーに低レイテンシーでコンテンツを配信するために使用するAWSサービスはどれですか?",["Amazon CloudFront","Amazon Route 53","AWS Direct Connect","Amazon VPC"],0,"CloudFrontはCDNサービスで、エッジロケーションにコンテンツをキャッシュして低レイテンシー配信を実現します。"],
+["t02","t","アプリケーションの高可用性を実現するために推奨される構成はどれですか?",["複数のアベイラビリティーゾーンにリソースを分散する","1つのアベイラビリティーゾーンに大きなインスタンスを1台置く","エッジロケーションにEC2インスタンスを配置する","インスタンスタイプを定期的に変更する"],0,"AZは物理的に分離されたデータセンター群です。複数AZに分散すれば、1つのAZで障害が起きてもサービスを継続できます。"],
+["t03","t","ほとんどアクセスされないデータを、数年間・最低コストで保管したい場合に最適なS3ストレージクラスはどれですか?",["S3 Glacier Deep Archive","S3 Standard","S3 Standard-IA","S3 Intelligent-Tiering"],0,"Glacier Deep ArchiveはS3で最も安価なストレージクラスで、長期アーカイブ向けです。取り出しには数時間かかります。"],
+["t04","t","サーバーのプロビジョニングや管理をせずに、イベントに応じてコードを実行できるサービスはどれですか?",["AWS Lambda","Amazon EC2","Amazon Lightsail","AWS Elastic Beanstalk"],0,"Lambdaはサーバーレスのコンピューティングサービスで、実行時間とリクエスト数に応じて課金されます。"],
+["t05","t","ミリ秒単位の応答が求められる、フルマネージドのNoSQL(キーバリュー)データベースはどれですか?",["Amazon DynamoDB","Amazon RDS","Amazon Redshift","Amazon Aurora"],0,"DynamoDBはサーバーレスのNoSQLデータベースです。RDSとAuroraはリレーショナルDB、Redshiftはデータウェアハウスです。"],
+["t06","t","EC2インスタンスのCPU使用率を監視し、しきい値を超えたらアラームを発行したい場合に使うサービスはどれですか?",["Amazon CloudWatch","AWS CloudTrail","AWS Config","Amazon GuardDuty"],0,"CloudWatchはメトリクスの収集・監視とアラームの設定ができます。アラームをAuto ScalingやSNS通知と連携させることも可能です。"],
+["t07","t","AWSリージョンを選ぶ際の判断材料として「適切でない」ものはどれですか?",["AWS本社の所在地","データの保管場所に関する法規制(データ主権)","ユーザーとの地理的な近さ(レイテンシー)","使いたいサービスがそのリージョンで提供されているか"],0,"リージョン選定では、コンプライアンス、ユーザーとの近さ、利用可能なサービス、料金の4点を考慮します。"],
+["t08","t","CloudFrontがコンテンツをキャッシュし、ユーザーの近くから配信するために使うAWSのインフラはどれですか?",["エッジロケーション","アベイラビリティーゾーン","VPC","Outposts"],0,"エッジロケーションは世界中の主要都市に配置された拠点で、CloudFrontやRoute 53などがユーザーに近い場所からサービスを提供するために使います。"],
+["t09","t","需要に応じてEC2インスタンスの台数を自動的に増減させるサービスはどれですか?",["Amazon EC2 Auto Scaling","Elastic Load Balancing","AWS Lambda","Amazon CloudFront"],0,"EC2 Auto Scalingは、CloudWatchのメトリクスやスケジュールに基づいてインスタンス数を自動調整します。"],
+["t10","t","受信したトラフィックを複数のEC2インスタンスに自動的に分散するサービスはどれですか?",["Elastic Load Balancing(ELB)","Amazon Route 53","AWS Global Accelerator","Amazon EC2 Auto Scaling"],0,"ELBは複数のターゲットにトラフィックを分散し、異常なインスタンスへの振り分けを自動で止めます。Auto Scalingと組み合わせて使うのが一般的です。"],
+["t11","t","EC2インスタンスにアタッチして使う、ブロックレベルの永続ストレージはどれですか?",["Amazon EBS","Amazon S3","Amazon EFS","Amazon S3 Glacier"],0,"Amazon EBSはEC2用のブロックストレージで、同じAZ内のインスタンスにアタッチして使います。インスタンスを停止してもデータは保持されます。"],
+["t12","t","複数のEC2インスタンスから同時にマウントでき、容量が自動で伸縮するLinux向けファイルストレージはどれですか?",["Amazon EFS","Amazon EBS","インスタンスストア","Amazon S3 Glacier"],0,"Amazon EFSはフルマネージドのNFSファイルシステムで、複数AZの多数のインスタンスから同時アクセスできます。"],
+["t13","t","画像や動画、バックアップなどを保存でき、99.999999999%(イレブンナイン)の耐久性を持つオブジェクトストレージはどれですか?",["Amazon S3","Amazon EBS","Amazon EFS","インスタンスストア"],0,"Amazon S3はオブジェクトストレージで、データを複数の施設に冗長保存することで非常に高い耐久性を実現しています。"],
+["t14","t","MySQLおよびPostgreSQLと互換性があり、高いパフォーマンスと可用性を持つAWS独自のリレーショナルデータベースはどれですか?",["Amazon Aurora","Amazon DynamoDB","Amazon Neptune","Amazon DocumentDB"],0,"Amazon AuroraはRDSで利用できるAWS独自のDBエンジンで、標準的なMySQLやPostgreSQLより高い性能をうたっています。"],
+["t15","t","大量のデータに対する分析クエリ(BI)を高速に実行するためのデータウェアハウスサービスはどれですか?",["Amazon Redshift","Amazon RDS","Amazon DynamoDB","Amazon ElastiCache"],0,"Amazon Redshiftはペタバイト規模に対応するデータウェアハウスで、分析用途(OLAP)に向いています。"],
+["t16","t","よく使うデータをメモリにキャッシュして、データベースの読み取り負荷を減らし応答を高速化するサービスはどれですか?",["Amazon ElastiCache","Amazon S3","Amazon EBS","AWS Backup"],0,"ElastiCacheはRedis(Valkey)やMemcachedと互換のインメモリキャッシュサービスです。"],
+["t17","t","AWSクラウド内に論理的に分離された仮想ネットワークを作成できるサービスはどれですか?",["Amazon VPC","AWS Direct Connect","Amazon CloudFront","AWS Outposts"],0,"Amazon VPCでは、IPアドレス範囲、サブネット、ルートテーブル、ゲートウェイなどを自分で定義した仮想ネットワークを作れます。"],
+["t18","t","プライベートサブネットのEC2インスタンスから、インターネットへのアウトバウンド通信だけを可能にするものはどれですか?",["NATゲートウェイ","インターネットゲートウェイ","仮想プライベートゲートウェイ","VPCピアリング"],0,"NATゲートウェイを使うと、プライベートサブネットのインスタンスがソフトウェア更新などでインターネットに出られますが、外部からの接続は受け付けません。"],
+["t19","t","オンプレミスのデータセンターとAWSを、インターネットを経由しない専用線で接続するサービスはどれですか?",["AWS Direct Connect","AWS Site-to-Site VPN","Amazon CloudFront","インターネットゲートウェイ"],0,"Direct Connectは専用の物理回線でAWSと接続するため、安定した帯域と低レイテンシーが得られます。"],
+["t20","t","オンプレミスネットワークとVPCを、インターネット経由の暗号化された通信で素早く接続したい場合に使うものはどれですか?",["AWS Site-to-Site VPN","AWS Direct Connect","AWS Snowball","Amazon Route 53"],0,"Site-to-Site VPNはインターネット上にIPsecの暗号化トンネルを作ります。専用線より導入が早く安価ですが、帯域は回線状況に左右されます。"],
+["t21","t","ドメイン名の登録やDNSによる名前解決を提供するサービスはどれですか?",["Amazon Route 53","Amazon CloudFront","Elastic Load Balancing","AWS Global Accelerator"],0,"Route 53はスケーラブルなDNSサービスで、ドメイン登録やヘルスチェック、ルーティングポリシー(レイテンシーベースなど)にも対応しています。"],
+["t22","t","テンプレート(JSON/YAML)でインフラをコードとして定義し、リソースを自動で作成・管理できるサービスはどれですか?",["AWS CloudFormation","AWS Config","AWS Systems Manager","AWS CloudTrail"],0,"CloudFormationはInfrastructure as Code(IaC)のサービスで、同じ環境を何度でも一貫した手順で構築できます。"],
+["t23","t","サーバーやクラスターを管理せずにコンテナを実行できる、ECSやEKSのサーバーレス実行環境はどれですか?",["AWS Fargate","Amazon EC2","Amazon Lightsail","AWS Outposts"],0,"AWS Fargateを使うと、コンテナを動かすためのEC2インスタンスの選択・管理が不要になります。"],
+["t24","t","1つのメッセージを複数の購読者にプッシュ配信(メール、SMS、Lambdaなど)できる発行/購読(Pub/Sub)型のサービスはどれですか?",["Amazon SNS","Amazon SQS","Amazon Kinesis","AWS Step Functions"],0,"Amazon SNSはトピックに発行されたメッセージを複数の購読者に同時に配信します。SQSはキューに溜めて受信側が取りに行くプル型です。"],
+["t25","t","機械学習モデルの構築・トレーニング・デプロイを一貫して行えるフルマネージドサービスはどれですか?",["Amazon SageMaker AI","Amazon Rekognition","Amazon Polly","Amazon Lex"],0,"SageMaker AIは、データ準備からモデルのトレーニング、デプロイまでMLの開発プロセス全体を支援します。"],
+["t26","t","機械学習の専門知識がなくても、画像や動画から物体・顔・テキストなどを検出できるサービスはどれですか?",["Amazon Rekognition","Amazon Comprehend","Amazon Textract","Amazon Transcribe"],0,"Rekognitionは画像・動画分析サービスです。Comprehendは自然言語処理、Textractは文書からのテキスト抽出、Transcribeは音声の文字起こしです。"],
+["t27","t","複数の企業が提供する基盤モデル(FM)をAPI経由で利用し、生成AIアプリケーションを構築できるフルマネージドサービスはどれですか?",["Amazon Bedrock","Amazon SageMaker AI","Amazon Kendra","Amazon Personalize"],0,"Amazon Bedrockを使うと、インフラを管理せずにさまざまな基盤モデルを選んで生成AIアプリを構築できます。"],
+["t28","t","S3に保存されたデータに対して、サーバーを用意せずに標準SQLで直接クエリを実行できるサービスはどれですか?",["Amazon Athena","Amazon Redshift","Amazon RDS","AWS Glue"],0,"Athenaはサーバーレスのクエリサービスで、スキャンしたデータ量に応じて課金されます。"],
+["t29","t","IoTデバイスやWebサイトのクリックストリームなどのデータをリアルタイムに収集・処理するサービスはどれですか?",["Amazon Kinesis","Amazon S3 Glacier","AWS Snowball","Amazon Redshift"],0,"Amazon Kinesisはストリーミングデータをリアルタイムで収集・処理・分析するためのサービス群です。"],
+["t30","t","AWSのインフラやサービスを顧客のオンプレミス施設に設置し、低レイテンシーやデータ所在地の要件に対応できるサービスはどれですか?",["AWS Outposts","AWS Local Zones","AWS Wavelength","Amazon CloudFront"],0,"AWS OutpostsはAWSが管理するラックを顧客のデータセンターに設置し、AWSと同じAPIやツールで使えるようにします。"],
+["t31","t","通信事業者の5Gネットワーク内にAWSのコンピューティングを配置し、モバイル端末向けに超低レイテンシーを実現するサービスはどれですか?",["AWS Wavelength","AWS Outposts","AWS Local Zones","AWS Direct Connect"],0,"AWS Wavelengthは5Gネットワークのエッジにアプリを配置できるサービスです。Local Zonesは大都市の近くにAWSリソースを配置するリージョンの拡張です。"],
+["t32","t","多数のEC2インスタンスやオンプレミスサーバーに対して、パッチ適用やコマンド実行などの運用タスクを一元的に自動化できるサービスはどれですか?",["AWS Systems Manager","AWS CloudFormation","AWS Config","Amazon Inspector"],0,"Systems Managerにはパッチ管理(Patch Manager)、リモートコマンド実行(Run Command)、パラメータ管理などの機能があります。"],
+["t33","t","EBS、RDS、DynamoDB、EFSなど複数のAWSサービスのバックアップをポリシーに基づいて一元管理できるサービスはどれですか?",["AWS Backup","Amazon S3 Glacier","AWS Storage Gateway","AWS DataSync"],0,"AWS Backupを使うと、サービスごとに別々に設定しなくても、バックアップのスケジュールや保持期間を一元管理できます。"],
+["t34","t","オンプレミスのアプリケーションから、クラウド上のストレージをローカルのように利用できるハイブリッドストレージサービスはどれですか?",["AWS Storage Gateway","Amazon EFS","AWS Snowcone","Amazon EBS"],0,"Storage Gatewayはオンプレミスとクラウドストレージをつなぎ、ファイル・ボリューム・テープのインターフェースで利用できるようにします。"],
+
+// ===== 分野4: 請求、料金、およびサポート (b) 12問 =====
+["b01","b","中断されても問題のないバッチ処理を、できるだけ低コストで実行したい場合に最適なEC2の購入オプションはどれですか?",["スポットインスタンス","オンデマンドインスタンス","リザーブドインスタンス","Dedicated Hosts"],0,"スポットインスタンスは余剰キャパシティを最大90%割引で使えますが、中断される可能性があります。長期の安定稼働ならリザーブドインスタンスやSavings Plansが適しています。"],
+["b02","b","テクニカルアカウントマネージャー(TAM)が割り当てられるAWSサポートプランはどれですか?",["Enterprise","Business","Developer","Basic"],0,"専任のTAMが付くのはEnterpriseサポートです(Enterprise On-Rampでは共有のTAMプール)。"],
+["b03","b","月額コストが設定した金額を超えそうなときにアラートを受け取りたい場合、どのサービスを使いますか?",["AWS Budgets","AWS Cost Explorer","AWS Pricing Calculator","AWS Artifact"],0,"AWS Budgetsはコストや使用量の予算を設定し、しきい値超過時にアラートを送れます。Cost Explorerは過去のコストの分析、Pricing Calculatorは事前見積もり用です。"],
+["b04","b","複数のAWSアカウントの請求を1つにまとめ(一括請求)、ボリュームディスカウントを受けられるサービスはどれですか?",["AWS Organizations","AWS Control Tower","AWS IAM","AWS Cost Explorer"],0,"AWS Organizationsの一括請求機能で、複数アカウントの使用量を合算して割引を受けられます。"],
+["b05","b","AWSのデータ転送料金について正しい説明はどれですか?",["インターネットからAWSへのデータ転送(イン)は通常無料","AWSからインターネットへのデータ転送(アウト)は常に無料","すべてのデータ転送は一律料金","同じリージョン内のAZ間転送は常に無料"],0,"インバウンド転送は基本的に無料で、アウトバウンド転送に課金されます。AZ間の転送も多くの場合は課金対象です。"],
+["b06","b","1年または3年の期間で1時間あたりの一定の利用額をコミットし、インスタンスファミリーやリージョンが変わっても割引が適用される料金モデルはどれですか?",["Compute Savings Plans","スポットインスタンス","オンデマンドインスタンス","Dedicated Hosts"],0,"Compute Savings PlansはEC2、Fargate、Lambdaの利用に柔軟に適用されます。EC2 Instance Savings Plansはより割引率が高い代わりに、リージョンとインスタンスファミリーが固定です。"],
+["b07","b","AWSへの移行前に、利用予定のサービス構成から月額コストを見積もりたい場合に使うツールはどれですか?",["AWS Pricing Calculator","AWS Cost Explorer","AWS Budgets","AWS Cost and Usage Report"],0,"Pricing Calculatorは、まだ使っていないサービスの料金を事前に見積もれる無料のWebツールです。"],
+["b08","b","AWS Lambdaの「月100万リクエストまで無料」は、AWS無料利用枠のどの種類に該当しますか?",["常時無料","12か月間無料","トライアル","リザーブド割引"],0,"無料利用枠には「常時無料」「12か月間無料」「短期トライアル」があります。Lambdaの無料枠は期限のない常時無料です。"],
+["b09","b","部署やプロジェクトごとにAWSのコストを分類して把握したい場合に、リソースに付けるものはどれですか?",["コスト配分タグ","IAMポリシー","セキュリティグループ","サービスコントロールポリシー"],0,"コスト配分タグを有効化すると、Cost ExplorerやCost and Usage Reportでタグごとにコストを集計できます。"],
+["b10","b","本番システムが停止した際に、1時間以内の応答が受けられる最も低価格のサポートプランはどれですか?",["Business","Developer","Basic","Enterprise"],0,"Businessサポートでは本番システム停止時に1時間以内の応答が受けられます。ビジネスクリティカルなシステム停止で15分以内の応答が必要ならEnterpriseです。"],
+["b11","b","サードパーティ製のソフトウェアやサービスを検索・購入し、すぐにAWS上で利用できるデジタルカタログはどれですか?",["AWS Marketplace","AWS Artifact","AWS Partner Network","AWS re:Post"],0,"AWS Marketplaceでは、セキュリティ製品やデータベースなど多数のソフトウェアをAWSの請求に含めて購入できます。"],
+["b12","b","すべてのAWSアカウントに無料で含まれるBasicサポートで利用できるものはどれですか?",["AWS re:Post とTrusted Advisorのコアチェック","テクニカルアカウントマネージャー(TAM)","技術サポートへの24時間電話問い合わせ","Trusted Advisorの全チェック"],0,"Basicサポートには、ドキュメント、AWS re:Post、AWS Health Dashboard、Trusted Advisorのコアチェック、請求とアカウントに関する問い合わせが含まれます。"]
+];
+
+(function(){
+"use strict";
+const DOM = {
+  c:{name:"クラウドの概念",short:"概念",color:"var(--c)",exam:16},
+  s:{name:"セキュリティとコンプライアンス",short:"セキュリティ",color:"var(--s)",exam:19},
+  t:{name:"クラウドテクノロジーとサービス",short:"テクノロジー",color:"var(--t)",exam:22},
+  b:{name:"請求、料金、およびサポート",short:"請求と料金",color:"var(--b)",exam:8}
+};
+const DKEYS = ["c","s","t","b"];
+const BY = {}; Q.forEach(q=>BY[q[0]]=q);
+const LABELS = ["A","B","C","D"];
+const LS_KEY = "clf-c02-progress-v1";
+const LS_EXAMS = "clf-c02-exams-v1";
+const EXAM_COUNT = 65, EXAM_SEC = 90*60;
+const app = document.getElementById("app");
+
+/* ---------- store ---------- */
+let store = emptyStore();
+function emptyStore(){return {v:1,u:0,history:[],stats:{},flags:[]};}
+function loadLocal(){
+  try{const raw=localStorage.getItem(LS_KEY); if(raw){const d=JSON.parse(raw); if(d&&d.v===1) return d;}}catch(e){}
+  return null;
+}
+function saveLocal(){try{localStorage.setItem(LS_KEY,JSON.stringify(store));}catch(e){}}
+/* exam records: one record per exam, kept without limit */
+let exams = [];
+function loadLocalExams(){try{const r=localStorage.getItem(LS_EXAMS); const a=r?JSON.parse(r):[]; return Array.isArray(a)?a:[];}catch(e){return [];}}
+function saveLocalExams(){try{localStorage.setItem(LS_EXAMS,JSON.stringify(exams));}catch(e){}}
+function addExams(list){
+  const have=new Set(exams.map(x=>x.t));
+  list.forEach(x=>{ if(x&&x.v===1&&typeof x.t==="number"&&!have.has(x.t)){exams.push(x);have.add(x.t);} });
+  exams.sort((a,b)=>b.t-a.t);
+}
+async function saveExamRemote(rec){
+  if(!remote.col) return;
+  try{ await remote.col.doc("exam_"+rec.t).set(JSON.parse(JSON.stringify(rec))); }catch(e){ remote.status="error"; updateSyncNote(); }
+}
+let remote = {col:null,ref:null,inflight:false,pending:false,timer:null,status:"local"};
+function persist(){
+  store.u = Date.now();
+  saveLocal();
+  if(!remote.ref) return;
+  clearTimeout(remote.timer);
+  remote.timer = setTimeout(flushRemote, 1200);
+}
+async function flushRemote(){
+  if(!remote.ref) return;
+  if(remote.inflight){remote.pending=true;return;}
+  remote.inflight=true;
+  try{await remote.ref.set(JSON.parse(JSON.stringify(store))); remote.status="synced";}
+  catch(e){remote.status="error";}
+  remote.inflight=false;
+  if(remote.pending){remote.pending=false;flushRemote();}
+  updateSyncNote();
+}
+async function initRemote(){
+  if(!window.claude || typeof window.claude.use!=="function") return;
+  try{
+    const [db,user] = await Promise.all([window.claude.use("db"),window.claude.use("user")]);
+    if(!db||!user) return;
+    const uid = await user.id();
+    if(!uid) return;
+    const col = db.collection("data/users/"+uid);
+    const ref = col.doc("progress");
+    const snap = await ref.get();
+    remote.ref = ref; remote.col = col;
+    try{
+      const qs = await col.get();
+      const remoteExams = qs.docs.filter(d=>d.id.indexOf("exam_")===0 && d.exists).map(d=>JSON.parse(JSON.stringify(d.data())));
+      const remoteTs = new Set(remoteExams.map(x=>x.t));
+      const localOnly = exams.filter(x=>!remoteTs.has(x.t));
+      addExams(remoteExams); saveLocalExams();
+      for(const x of localOnly){ await saveExamRemote(x); }
+    }catch(e){}
+    if(snap.exists){
+      const d = snap.data();
+      if(d && d.v===1 && (d.u||0) >= (store.u||0)){
+        store = JSON.parse(JSON.stringify(d));
+        if(!store.flags) store.flags=[]; if(!store.stats) store.stats={}; if(!store.history) store.history=[];
+        saveLocal();
+      } else { flushRemote(); }
+    } else if(store.u){ flushRemote(); }
+    remote.status="synced";
+    if(view==="home") renderHome(true);
+  }catch(e){ remote.status="error"; updateSyncNote(); }
+}
+function updateSyncNote(){
+  const el=document.getElementById("sync"); if(!el) return;
+  el.textContent = remote.status==="synced" ? "学習記録はあなたのアカウントに保存され、ほかの端末からも引き継がれます。"
+    : remote.status==="error" ? "サーバーへの保存に失敗したため、このブラウザにのみ保存しています。"
+    : "学習記録はこのブラウザに保存されています。";
+}
+function stat(id){return store.stats[id]||{s:0,w:0};}
+function record(id,correct){
+  const st = Object.assign({s:0,w:0},store.stats[id]); st.s++; if(!correct) st.w++; store.stats[id]=st;
+}
+function isFlag(id){return store.flags.indexOf(id)>=0;}
+function toggleFlag(id){
+  const i=store.flags.indexOf(id); if(i>=0) store.flags.splice(i,1); else store.flags.push(id);
+  persist();
+}
+
+/* ---------- utils ---------- */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function fmtTime(sec){sec=Math.max(0,Math.round(sec));const m=Math.floor(sec/60),s=sec%60;return m+":"+String(s).padStart(2,"0");}
+function fmtDate(t){const d=new Date(t);return (d.getMonth()+1)+"/"+d.getDate()+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
+const FLAG_SVG='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 15V1.5M3 2h9l-2 3.5L12 9H3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+
+/* ---------- home settings ---------- */
+const cfg = {count:20, domains:{c:true,s:true,t:true,b:true}, source:"random"};
+let view = "home";
+
+function poolFor(){
+  const ds = DKEYS.filter(k=>cfg.domains[k]);
+  let pool = Q.filter(q=>ds.indexOf(q[1])>=0).map(q=>q[0]);
+  if(cfg.source==="flagged") pool = pool.filter(isFlag);
+  return pool;
+}
+function pickPractice(){
+  let pool = poolFor();
+  const n = Math.min(cfg.count,pool.length);
+  if(cfg.source==="weak"){
+    const r = shuffle(pool).map(id=>{const st=stat(id);return {id, g: st.w>0 ? 2 : (st.s===0?1:0), w:st.w, rate: st.s? st.w/st.s : 0};});
+    r.sort((a,b)=>b.g-a.g || b.w-a.w || b.rate-a.rate);
+    return r.slice(0,n).map(x=>x.id);
+  }
+  return shuffle(pool).slice(0,n);
+}
+function pickExam(){
+  let ids=[];
+  DKEYS.forEach(k=>{ ids = ids.concat(shuffle(Q.filter(q=>q[1]===k).map(q=>q[0])).slice(0,DOM[k].exam)); });
+  return ids;
+}
+
+function renderHome(keep){
+  const sy=window.scrollY;
+  view="home"; stopTimer();
+  const h = store.history;
+  const last = h.length? h[h.length-1] : null;
+  const pool = poolFor();
+  const nUse = Math.min(cfg.count,pool.length);
+  const noDomain = !DKEYS.some(k=>cfg.domains[k]);
+  let poolNote = "";
+  if(noDomain) poolNote = '<p class="note warn">分野を1つ以上選んでください。</p>';
+  else if(pool.length===0 && cfg.source==="flagged") poolNote = '<p class="note warn">選んだ分野に見直しフラグ付きの問題がありません。問題画面の「見直し」ボタンで印を付けられます。</p>';
+  else if(pool.length < cfg.count) poolNote = '<p class="note">対象は '+pool.length+' 問のため、'+pool.length+' 問で出題します。</p>';
+  else poolNote = '<p class="note">対象 '+pool.length+' 問から '+nUse+' 問を出題します。</p>';
+
+  const marks = Array.from({length:16},(_,i)=>'<i class="'+([1,6,8,15].indexOf(i)>=0?"f":"")+'"></i>').join("");
+
+  app.innerHTML = `
+  <header class="mast">
+    <div class="code">CLF-C02</div>
+    <h1>AWS クラウドプラクティショナー マークシート演習</h1>
+    <p>全 ${Q.length} 問。解き直すたびに問題と選択肢の順番が入れ替わります。</p>
+    <div class="marks" aria-hidden="true">${marks}</div>
+  </header>
+
+  <div class="stats" role="group" aria-label="学習状況">
+    <div><b>${h.length}</b><span>解いた回数</span></div>
+    <div><b>${last? Math.round(last.correct/last.total*100)+"%" : "—"}</b><span>前回の正答率</span></div>
+    <div><b>${store.flags.length}</b><span>見直しフラグ</span></div>
+  </div>
+
+  <section class="block">
+    <h2>練習モード</h2>
+    <p class="lead">1問ごとに正誤と解説を表示します。</p>
+    <div class="panel">
+      <div class="field"><span class="lbl" id="l-count">問題数</span>
+        <div class="seg" role="group" aria-labelledby="l-count">
+          ${[20,50,100].map(n=>`<button type="button" data-count="${n}" aria-pressed="${cfg.count===n}">${n}問</button>`).join("")}
+        </div></div>
+      <div class="field"><span class="lbl" id="l-dom">分野</span>
+        <div class="chips" role="group" aria-labelledby="l-dom">
+          ${DKEYS.map(k=>`<button type="button" class="chip" style="--dc:${DOM[k].color}" data-dom="${k}" aria-pressed="${cfg.domains[k]}"><span class="dot"></span>${DOM[k].short}<span class="muted small">${Q.filter(q=>q[1]===k).length}</span></button>`).join("")}
+        </div></div>
+      <div class="field"><span class="lbl" id="l-src">出題方法</span>
+        <div class="seg" role="group" aria-labelledby="l-src">
+          <button type="button" data-src="random" aria-pressed="${cfg.source==="random"}">ランダム</button>
+          <button type="button" data-src="weak" aria-pressed="${cfg.source==="weak"}">苦手を優先</button>
+          <button type="button" data-src="flagged" aria-pressed="${cfg.source==="flagged"}">フラグのみ</button>
+        </div>
+        ${cfg.source==="weak"?'<p class="note">間違えた回数が多い問題、まだ解いていない問題の順に優先して出題します。</p>':''}
+      </div>
+      ${poolNote}
+      <div class="row" style="margin-top:14px"><button class="btn primary" id="startP" ${(noDomain||pool.length===0)?"disabled":""}>練習を始める</button></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>本番モード</h2>
+    <p class="lead">本番と同じ問題数と制限時間で、分野の比率も本番に合わせて出題します。正誤と解説は採点後にまとめて表示します。</p>
+    <div class="panel exam-card">
+      <div class="big">65<small>問</small> 90<small>分</small></div>
+      <button class="btn primary" id="startE">本番モードを始める</button>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>学習履歴</h2>
+    ${historyHTML()}
+    <p class="sync" id="sync"></p>
+  </section>`;
+  updateSyncNote();
+
+  app.querySelectorAll("[data-count]").forEach(b=>b.onclick=()=>{cfg.count=+b.dataset.count;renderHome(true);focusSel('[data-count="'+cfg.count+'"]');});
+  app.querySelectorAll("[data-dom]").forEach(b=>b.onclick=()=>{cfg.domains[b.dataset.dom]=!cfg.domains[b.dataset.dom];renderHome(true);focusSel('[data-dom="'+b.dataset.dom+'"]');});
+  app.querySelectorAll("[data-src]").forEach(b=>b.onclick=()=>{cfg.source=b.dataset.src;renderHome(true);focusSel('[data-src="'+cfg.source+'"]');});
+  document.getElementById("startP").onclick=()=>{
+    const ids = pickPractice(); if(!ids.length) return;
+    const ds = DKEYS.filter(k=>cfg.domains[k]);
+    const label = "練習 "+ids.length+"問" + (ds.length<4? "("+ds.map(k=>DOM[k].short).join("・")+")":"") + (cfg.source==="weak"?" 苦手優先":cfg.source==="flagged"?" フラグ":"");
+    startSession("practice", ids, label);
+  };
+  document.getElementById("startE").onclick=()=>startSession("exam", pickExam(), "本番 65問");
+  const on2=(i,f)=>{const el=document.getElementById(i); if(el) el.onclick=f;};
+  on2("histMore",()=>{ui.histOpen=!ui.histOpen;renderHome(true);focusSel("#histMore");});
+  on2("weakMore",()=>{ui.weakOpen=!ui.weakOpen;renderHome(true);focusSel("#weakMore");});
+  on2("examMore",()=>{ui.examOpen=!ui.examOpen;renderHome(true);focusSel("#examMore");});
+  app.querySelectorAll("[data-exam]").forEach(b=>b.onclick=()=>openExam(+b.dataset.exam));
+  const rs=document.getElementById("resetData"); if(rs) rs.onclick=()=>confirmDlg("学習履歴・本番モードの記録・苦手データ・見直しフラグをすべて削除します。元に戻せません。削除しますか?","削除する",()=>{store=emptyStore();persist();exams=[];saveLocalExams();deleteRemoteExams();renderHome();});
+  window.scrollTo(0, keep? sy : 0);
+}
+async function deleteRemoteExams(){
+  if(!remote.col) return;
+  try{const qs=await remote.col.get(); for(const d of qs.docs){ if(d.id.indexOf("exam_")===0) await remote.col.doc(d.id).delete(); }}catch(e){}
+}
+function focusSel(sel){const el=app.querySelector(sel); if(el) el.focus({preventScroll:true});}
+
+const ui={histOpen:false,examOpen:false,weakOpen:false};
+function moreBtn(id,open,rest,what){return `<button type="button" class="more" id="${id}" aria-expanded="${open}"><span class="chev" aria-hidden="true">›</span>${open?what+"を閉じる":what+"を表示(残り"+rest+"件)"}</button>`;}
+function examRows(){
+  const detailTs=new Set(exams.map(x=>x.t));
+  const legacy=store.history.filter(p=>p.mode==="exam"&&!detailTs.has(p.t)).map(p=>({t:p.t,total:p.total,correct:p.correct,nodetail:true}));
+  return exams.map(x=>({t:x.t,total:x.total,correct:x.correct})).concat(legacy).sort((a,b)=>b.t-a.t);
+}
+function examListHTML(){
+  const rows=examRows();
+  if(!rows.length) return "";
+  const row=r=>{const p=r.total?Math.round(r.correct/r.total*100):0;
+    return `<li><button type="button" class="exam-row" ${r.nodetail?"disabled":`data-exam="${r.t}"`} aria-label="${fmtDate(r.t)} ${p}% ${r.correct}/${r.total}問${r.nodetail?" 詳細なし":" 結果を開く"}"><span>${fmtDate(r.t)}</span><span class="sc"><span class="p">${p}%</span>(${r.correct}/${r.total}問)${r.nodetail?'<span class="nod">詳細なし</span>':'<span class="go" aria-hidden="true">›</span>'}</span></button></li>`;};
+  const rest=rows.length-5;
+  return `<h3 style="font-size:15px;margin-top:22px">本番モードの記録</h3><ul class="exam-list" id="examList">${rows.slice(0,5).map(row).join("")}${ui.examOpen?rows.slice(5).map(row).join(""):""}</ul>${rest>0?moreBtn("examMore",ui.examOpen,rest,"過去の記録"):""}`;
+}
+function historyHTML(){
+  const h = store.history;
+  if(!h.length) return '<div class="empty">まだ記録がありません。練習モードか本番モードで1回解くと、ここに正答率の推移と苦手な問題が表示されます。</div>';
+  const pts = h.slice(-20);
+  const W=640,H=110,pad=8;
+  const x=i=> pts.length===1? W/2 : pad + i*(W-2*pad)/(pts.length-1);
+  const y=v=> H-pad - v*(H-2*pad);
+  const line = pts.map((p,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(p.correct/p.total).toFixed(1)).join(" ");
+  const dots = pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.correct/p.total).toFixed(1)}" r="4" fill="${p.mode==="exam"?"var(--ink)":"var(--sheet)"}" stroke="var(--ink)" stroke-width="1.6"><title>${fmtDate(p.t)} ${Math.round(p.correct/p.total*100)}%</title></circle>`).join("");
+  const svg = `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="直近${pts.length}回の正答率の推移">
+    <line x1="0" x2="${W}" y1="${y(.7)}" y2="${y(.7)}" stroke="var(--guide)" stroke-dasharray="4 4" stroke-width="1"/>
+    <path d="${line}" fill="none" stroke="var(--ink)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>${dots}</svg>`;
+  const all = h.slice().reverse();
+  const li = p=>`<li><span>${fmtDate(p.t)} ${esc(p.label||"")}</span><b>${p.correct}/${p.total}(${Math.round(p.correct/p.total*100)}%)</b></li>`;
+  const rest = all.length-5;
+  const list = all.slice(0,5).map(li).join("") + (ui.histOpen? all.slice(5).map(li).join("") : "");
+  const histMore = rest>0 ? moreBtn("histMore",ui.histOpen,rest,"過去の履歴") : "";
+  const weak = Object.keys(store.stats).map(id=>({id,st:store.stats[id]})).filter(o=>o.st.w>0 && BY[o.id])
+    .sort((a,b)=>b.st.w-a.st.w || (b.st.w/b.st.s)-(a.st.w/a.st.s)).slice(0,5);
+  const weakHTML = weak.length? `<div style="margin-top:14px"><button type="button" class="more" id="weakMore" aria-expanded="${ui.weakOpen}" aria-controls="weakList" style="color:var(--ink);font-size:15px"><span class="chev" aria-hidden="true">›</span>よく間違える問題(${weak.length}問)</button>${ui.weakOpen?`<ul class="weak" id="weakList">${weak.map(o=>`<li><span class="rate">${o.st.w}/${o.st.s}回</span><span>${esc(BY[o.id][2])}</span></li>`).join("")}</ul>`:""}</div>` : "";
+  return `<div class="panel">
+    <div class="row" style="justify-content:space-between"><span class="small muted">直近${pts.length}回の正答率(点線は合格目安の70%、黒丸は本番モード)</span></div>
+    ${svg}<ul class="hist-list" id="histList">${list}</ul>${histMore}${examListHTML()}${weakHTML}
+    <div class="row" style="margin-top:18px"><button class="btn ghost small" id="resetData">記録をすべて削除</button></div>
+  </div>`;
+}
+
+/* ---------- session ---------- */
+let S = null, timerId = null;
+function startSession(mode, ids, label){
+  const order = shuffle(ids);
+  const opt = {}; order.forEach(id=>opt[id]=shuffle([0,1,2,3]));
+  S = {mode, ids:order, opt, idx:0, ans:{}, done:{}, label, srcIds:ids.slice(), t0:Date.now(), deadline: mode==="exam"? Date.now()+EXAM_SEC*1000 : 0, grid:false};
+  if(mode==="exam") startTimer();
+  renderQ();
+}
+function startTimer(){stopTimer(); timerId=setInterval(()=>{
+  const left=(S.deadline-Date.now())/1000; const el=document.getElementById("timer");
+  if(el){el.textContent=fmtTime(left); el.classList.toggle("low",left<300);}
+  if(left<=0){stopTimer(); finish();}
+},1000);}
+function stopTimer(){if(timerId){clearInterval(timerId);timerId=null;}}
+
+function renderQ(){
+  view="q";
+  const id=S.ids[S.idx], q=BY[id], d=DOM[q[1]], n=S.ids.length;
+  const chosen=S.ans[id]; const revealed = S.mode==="practice" && S.done[id];
+  const answered = Object.keys(S.ans).length;
+  const pct = S.mode==="exam"? answered/n*100 : (Object.keys(S.done).length/n*100);
+  const opts = S.opt[id].map((oi,pos)=>{
+    let cls="opt", verdict="";
+    if(chosen===oi) cls+=" sel";
+    if(revealed){ if(oi===q[4]){cls+=" ok"; verdict= chosen===oi?"正解":"正答";} else if(chosen===oi){cls+=" ng"; verdict="あなたの解答";} }
+    return `<li><button type="button" class="${cls}" data-oi="${oi}" ${revealed?"disabled":""} aria-pressed="${chosen===oi}"><span class="oval">${LABELS[pos]}</span><span>${esc(q[3][oi])}</span>${verdict?`<span class="verdict">${verdict}</span>`:""}</button></li>`;
+  }).join("");
+  let explain="";
+  if(revealed){const ok=chosen===q[4]; explain=`<div class="explain ${ok?"ok":"ng"}" id="exp" tabindex="-1"><h3>${ok?"正解":"不正解"}</h3><p>${esc(q[5])}</p></div>`;}
+  const flagged=isFlag(id);
+  const last = S.idx===n-1;
+  let nav;
+  if(S.mode==="practice"){
+    nav = `<div class="nav"><button class="btn ghost" id="quit">中断してホームへ</button>
+      ${revealed? `<button class="btn primary" id="next">${last?"結果を見る":"次の問題"}</button>` : `<span class="muted small" style="align-self:center">選択肢を選ぶと正誤が表示されます</span>`}</div>`;
+  } else {
+    nav = `<div class="nav"><div class="row"><button class="btn ghost" id="prev" ${S.idx===0?"disabled":""}>前へ</button><button class="btn ghost" id="next2" ${last?"disabled":""}>次へ</button></div>
+      <div class="row"><button class="btn ghost" id="gridT" aria-expanded="${S.grid}">問題一覧</button><button class="btn primary" id="grade">採点する</button></div></div>
+      ${S.grid? gridHTML():""}
+      <div class="nav" style="margin-top:28px"><button class="btn ghost small" id="quit">中断してホームへ</button></div>`;
+  }
+  app.innerHTML = `
+  <div class="bar"><div class="row">
+    <span class="qno">${S.idx+1} <span class="muted">/ ${n}</span></span>
+    <div class="row">
+      ${S.mode==="exam"?`<span class="timer" id="timer" aria-label="残り時間">${fmtTime((S.deadline-Date.now())/1000)}</span>`:""}
+      <button class="iconbtn" id="flag" aria-pressed="${flagged}">${FLAG_SVG}${flagged?"見直し中":"見直し"}</button>
+    </div></div>
+    <div class="prog"><i style="width:${pct}%"></i></div>
+  </div>
+  <span class="dtag" style="--dc:${d.color}">${d.name}</span>
+  <p class="qtext" id="qt" tabindex="-1">${esc(q[2])}</p>
+  <ul class="opts">${opts}</ul>
+  ${explain}${nav}`;
+
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>choose(+b.dataset.oi));
+  document.getElementById("flag").onclick=()=>{toggleFlag(id);renderQ();document.getElementById("flag").focus();};
+  const on=(i,f)=>{const el=document.getElementById(i); if(el) el.onclick=f;};
+  on("quit",()=>confirmDlg("この回の結果は履歴に残りません(解いた問題の正誤は苦手データに反映済みです)。ホームに戻りますか?","ホームに戻る",renderHome));
+  on("next",()=>{ if(last) finish(); else {S.idx++;renderQ();scrollTop();} });
+  on("prev",()=>{S.idx--;renderQ();scrollTop();});
+  on("next2",()=>{S.idx++;renderQ();scrollTop();});
+  on("gridT",()=>{S.grid=!S.grid;renderQ();});
+  on("grade",()=>{
+    const un = n-Object.keys(S.ans).length;
+    confirmDlg(un? `未解答が ${un} 問あります。このまま採点しますか?` : "採点します。よろしいですか?","採点する",finish);
+  });
+  app.querySelectorAll(".cell").forEach(c=>c.onclick=()=>{S.idx=+c.dataset.i;renderQ();scrollTop();});
+  if(revealed){const e=document.getElementById("next"); if(e) e.focus({preventScroll:true});}
+}
+function scrollTop(){window.scrollTo(0,0); const t=document.getElementById("qt"); if(t) t.focus({preventScroll:true});}
+function gridHTML(){
+  return `<div class="grid" role="group" aria-label="問題一覧">${S.ids.map((id,i)=>`<button type="button" class="cell ${S.ans[id]!==undefined?"ans":""} ${i===S.idx?"cur":""} ${isFlag(id)?"fl":""}" data-i="${i}" aria-label="問題${i+1}${S.ans[id]!==undefined?" 解答済み":" 未解答"}${isFlag(id)?" 見直し":""}">${i+1}</button>`).join("")}</div>
+  <div class="legend"><span><i style="background:var(--guide-soft);border-color:var(--guide)"></i>解答済み</span><span><i></i>未解答</span><span><i style="border-radius:50%;background:var(--flag);border-color:var(--flag)"></i>見直し</span></div>`;
+}
+function choose(oi){
+  const id=S.ids[S.idx];
+  if(S.mode==="practice"){
+    if(S.done[id]) return;
+    S.ans[id]=oi; S.done[id]=true; record(id, oi===BY[id][4]); persist();
+    renderQ(); const e=document.getElementById("exp"); if(e) e.scrollIntoView({block:"nearest",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+  } else {
+    S.ans[id]=oi; renderQ();
+  }
+}
+
+/* ---------- results ---------- */
+let R=null;
+function finish(){
+  stopTimer();
+  const ids = S.ids;
+  const answeredIds = S.mode==="practice"? ids.filter(id=>S.done[id]) : ids;
+  const dom={}; DKEYS.forEach(k=>dom[k]={ok:0,n:0});
+  let correct=0; const wrong=[];
+  answeredIds.forEach(id=>{const q=BY[id]; const ok=S.ans[id]===q[4]; dom[q[1]].n++; if(ok){dom[q[1]].ok++;correct++;} else wrong.push(id);
+    if(S.mode==="exam" && S.ans[id]!==undefined) record(id,ok);});
+  const entry={t:Date.now(),mode:S.mode,label:S.label,total:answeredIds.length,correct,dom,sec:Math.round((Date.now()-S.t0)/1000)};
+  if(answeredIds.length){ store.history.push(entry); if(store.history.length>100) store.history=store.history.slice(-100); persist(); }
+  if(S.mode==="exam"){
+    const ans={}; Object.keys(S.ans).forEach(k=>ans[k]=S.ans[k]);
+    const rec={v:1,t:entry.t,label:S.label,total:entry.total,correct,dom,sec:entry.sec,timeUp:Date.now()>=S.deadline,ids:ids.slice(),opt:S.opt,ans};
+    addExams([rec]); saveLocalExams(); saveExamRemote(rec);
+  }
+  R={entry,wrong,ids:answeredIds,ans:Object.assign({},S.ans),mode:S.mode,srcIds:S.srcIds,label:S.label,opt:S.opt,showAll:false,timeUp:S.mode==="exam"&&Date.now()>=S.deadline};
+  renderResult();
+}
+function openExam(t){
+  const x=exams.find(e=>e.t===t); if(!x) return;
+  const ids=x.ids.filter(id=>BY[id]);
+  const wrong=ids.filter(id=>x.ans[id]!==BY[id][4]);
+  R={entry:{t:x.t,mode:"exam",label:x.label,total:x.total,correct:x.correct,dom:x.dom,sec:x.sec},wrong,ids,ans:x.ans,mode:"exam",srcIds:ids,label:x.label,opt:x.opt,showAll:false,timeUp:!!x.timeUp,past:true};
+  renderResult();
+}
+function renderResult(){
+  view="r";
+  const e=R.entry, pct=e.total? Math.round(e.correct/e.total*100):0;
+  const domRows = DKEYS.filter(k=>e.dom[k].n>0).map(k=>{const v=e.dom[k];const p=Math.round(v.ok/v.n*100);
+    return `<span style="--dc:${DOM[k].color}">${DOM[k].short}</span><span class="track" style="--dc:${DOM[k].color}" role="img" aria-label="${DOM[k].short} ${p}%"><i style="width:${p}%"></i></span><span class="n">${v.ok}/${v.n}<span class="muted small"> (${p}%)</span></span>`;}).join("");
+  const list = (R.showAll? R.ids : R.wrong).map((id,i)=>{
+    const q=BY[id], a=R.ans[id], ok=a===q[4]; const d=DOM[q[1]];
+    const pos = oi=>LABELS[R.opt[id].indexOf(oi)];
+    return `<li><div class="top"><span class="dtag" style="--dc:${d.color};margin:0">${d.short}</span><button class="iconbtn" data-flag="${id}" aria-pressed="${isFlag(id)}">${FLAG_SVG}${isFlag(id)?"見直し中":"見直し"}</button></div>
+      <p class="q">${esc(q[2])}</p>
+      <p class="a ${ok?"okt":"ngt"}">あなたの解答:${a===undefined?"未解答":pos(a)+". "+esc(q[3][a])}</p>
+      ${ok?"":`<p class="a okt">正答:${pos(q[4])}. ${esc(q[3][q[4]])}</p>`}
+      <p class="e">${esc(q[5])}</p></li>`;}).join("");
+  app.innerHTML = `
+  <div class="score">
+    <div class="pct">${pct}<small>%</small></div>
+    <div class="meta"><b>${e.correct} / ${e.total} 問 正解</b><br>
+      <span class="muted small">${R.past?fmtDate(e.t)+" 実施・":""}${esc(R.label)}・所要時間 ${fmtTime(e.sec)}${R.timeUp?"(時間切れ)":""}</span><br>
+      <span class="pass ${pct>=70?"y":"n"}">${pct>=70?"合格目安の70%に到達":"合格目安の70%まであと"+Math.max(0,Math.ceil(e.total*0.7)-e.correct)+"問"}</span></div>
+  </div>
+  <section class="block"><h2 style="margin-bottom:14px">分野ごとの正誤</h2><div class="dom">${domRows||'<span class="muted">解答した問題がありません。</span>'}</div>
+    <p class="note">縦線は70%の位置です。</p></section>
+  <div class="row" style="margin-bottom:34px">
+    <button class="btn primary" id="retryWrong" ${R.wrong.length?"":"disabled"}>${R.past?"この回の":""}間違えた問題だけ解き直す(${R.wrong.length}問)</button>
+    ${R.past?"":'<button class="btn" id="retry">やり直す</button>'}
+    <button class="btn ghost" id="home">${R.past?"ホームへ戻る":"ホームへ"}</button>
+  </div>
+  <section class="block">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px"><h2>${R.showAll?"すべての問題":"間違えた問題"}</h2>
+      <button class="btn ghost small" id="toggleAll">${R.showAll?"間違えた問題だけ表示":"すべての問題を表示"}</button></div>
+    ${list? `<ul class="review">${list}</ul>` : '<div class="empty">全問正解です。「やり直す」で順番を変えて、もう一度確認できます。</div>'}
+  </section>`;
+  document.getElementById("retryWrong").onclick=()=>startSession("practice",R.wrong,"解き直し "+R.wrong.length+"問");
+  const rt=document.getElementById("retry"); if(rt) rt.onclick=()=>startSession(R.mode, R.srcIds, R.label);
+  document.getElementById("home").onclick=()=>{const p=R.past; renderHome(); if(p){const el=document.getElementById("examList"); if(el) el.scrollIntoView();}};
+  document.getElementById("toggleAll").onclick=()=>{R.showAll=!R.showAll;renderResult();document.getElementById("toggleAll").focus();};
+  app.querySelectorAll("[data-flag]").forEach(b=>b.onclick=()=>{toggleFlag(b.dataset.flag);const on=isFlag(b.dataset.flag);b.setAttribute("aria-pressed",on);b.innerHTML=FLAG_SVG+(on?"見直し中":"見直し");});
+  window.scrollTo(0,0);
+}
+
+/* ---------- dialog ---------- */
+function confirmDlg(msg,okLabel,onOk){
+  const prev=document.activeElement;
+  const back=document.createElement("div"); back.className="dlg-back";
+  back.innerHTML=`<div class="dlg" role="dialog" aria-modal="true" aria-label="確認"><p>${esc(msg)}</p><div class="row" style="justify-content:flex-end"><button class="btn ghost" data-x>キャンセル</button><button class="btn primary" data-ok>${esc(okLabel)}</button></div></div>`;
+  document.body.appendChild(back);
+  const close=()=>{back.remove(); document.removeEventListener("keydown",key); if(prev&&prev.focus&&document.contains(prev)) prev.focus();};
+  const key=e=>{if(e.key==="Escape") close();};
+  document.addEventListener("keydown",key);
+  back.querySelector("[data-x]").onclick=close;
+  back.querySelector("[data-ok]").onclick=()=>{close();onOk();};
+  back.onclick=e=>{if(e.target===back) close();};
+  back.querySelector("[data-ok]").focus();
+}
+
+/* keyboard: 1-4 / A-D to answer */
+document.addEventListener("keydown",e=>{
+  if(view!=="q"||document.querySelector(".dlg-back")||e.metaKey||e.ctrlKey||e.altKey) return;
+  const k=e.key.toUpperCase(); let pos=-1;
+  if("1234".indexOf(k)>=0&&k) pos=+k-1; else if("ABCD".indexOf(k)>=0&&k.length===1) pos="ABCD".indexOf(k);
+  if(pos>=0){const id=S.ids[S.idx]; if(S.mode==="practice"&&S.done[id]) return; choose(S.opt[id][pos]);}
+});
+
+const l=loadLocal(); if(l){store=l; if(!store.flags)store.flags=[]; if(!store.stats)store.stats={}; if(!store.history)store.history=[];}
+addExams(loadLocalExams());
+renderHome();
+initRemote();
+})();
+</script>
+</body>
+</html>
